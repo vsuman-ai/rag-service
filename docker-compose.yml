@@ -1,0 +1,33 @@
+## Local one-shot dev stack.
+##
+## ChromaDB runs embedded inside the rag-service container — no separate
+## service is needed. The named volume keeps the vector store across runs.
+
+services:
+  rag-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rag-service:0.1.0
+    container_name: rag-service
+    restart: unless-stopped
+    ports:
+      # Override with: ``RAG_HOST_PORT=18002 docker compose up``.
+      - "${RAG_HOST_PORT:-8000}:8000"
+    environment:
+      RAG_LOG_LEVEL: INFO
+      RAG_EMBEDDING_BACKEND: gecko-mock
+      RAG_LLM_BACKEND: mock
+      RAG_CHROMA_PERSIST_DIRECTORY: /data/chroma
+      RAG_CHROMA_COLLECTION_NAME: rag_chunks
+    volumes:
+      - chroma-data:/data/chroma
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  chroma-data:
