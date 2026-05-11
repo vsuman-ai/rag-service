@@ -62,3 +62,4 @@ Thumbs.db
 
 # graphify cache (keep graphify-out itself committed)
 graphify-out/cache/
+/docs/*.pdf
