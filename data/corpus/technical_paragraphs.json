@@ -1,0 +1,55 @@
+{
+  "description": "Curated 10-paragraph technical corpus for the Context-Aware Retrieval Engine assessment. Paragraphs cover Site Reliability Engineering / distributed systems topics so that Strategy B (query expansion with SRE-domain synonyms) can demonstrably outperform Strategy A on conversational queries.",
+  "documents": [
+    {
+      "doc_id": "doc-autoscaling",
+      "topic": "autoscaling",
+      "text": "The service is deployed behind a horizontal autoscaler that watches CPU utilisation and queue depth as primary signals. When traffic spikes, the autoscaler increases replica count using a Kubernetes Horizontal Pod Autoscaler with a target utilisation of 60 percent. A predictive scaler precomputes capacity for known recurring patterns (daily standup peaks, Monday-morning logins) so that cold starts do not appear on the critical path. Maximum replica count and minimum baseline are set per environment and enforced via cluster quotas to prevent runaway scale-out events from exhausting node capacity."
+    },
+    {
+      "doc_id": "doc-load-balancing",
+      "topic": "load balancing",
+      "text": "Incoming traffic terminates at a layer-7 load balancer that performs TLS termination, weighted round-robin distribution and health-check-based pool eviction. Backends are grouped into pools by availability zone, and the load balancer enforces session affinity only when required by stateful endpoints. Sustained 5xx error rates trigger automatic pool draining and slow re-introduction once health checks pass for ten consecutive intervals. The load balancer also performs basic application-layer DDoS mitigation by rejecting requests that exceed configured per-source rate limits."
+    },
+    {
+      "doc_id": "doc-caching",
+      "topic": "caching",
+      "text": "Hot read paths are accelerated with a two-tier cache: an in-process LRU cache for sub-millisecond hits and a shared Redis cluster for cross-replica coherence. Cache keys include a tenant identifier and a content version so that invalidations are scoped and never cause global cache stampedes. Write paths use a write-through strategy for transactional data and a write-back queue with bounded retries for analytics events. A short request-coalescing window deduplicates concurrent cache misses for the same key, preventing thundering-herd effects when a popular entry expires."
+    },
+    {
+      "doc_id": "doc-message-queue",
+      "topic": "message queue",
+      "text": "Asynchronous work is dispatched through a partitioned Kafka topic with consumer groups that scale independently of producers. Each consumer applies back-pressure by halving its prefetch when the local processing latency exceeds a target service level objective, which prevents head-of-line blocking. Failed messages are routed to a dead-letter topic with a maximum of three retries, and operators can replay from the DLQ after fixing the upstream defect. Producer batching and lz4 compression keep network costs low even at sustained throughput in the hundreds of thousands of messages per second."
+    },
+    {
+      "doc_id": "doc-circuit-breaker",
+      "topic": "circuit breaker",
+      "text": "Every outbound dependency is wrapped in a circuit breaker that transitions to OPEN when the rolling error rate exceeds 25 percent over a sliding window. While OPEN, callers receive an immediate fallback response (cached value, default, or graceful degradation) rather than waiting for the timeout. A HALF-OPEN probe lets a small fraction of requests through to test recovery, and the breaker closes only after several consecutive successes. Combined with bulkheads that isolate connection pools per downstream, this prevents one slow dependency from exhausting all worker threads."
+    },
+    {
+      "doc_id": "doc-blue-green",
+      "topic": "deployment",
+      "text": "Releases follow a blue-green deployment with progressive traffic shifting. The new (green) version is brought up alongside the existing (blue) fleet, internal smoke tests validate the new build, and the load balancer is reconfigured to send 5, 25 and 100 percent of traffic to green in stages. If the green fleet exceeds error or latency budgets at any stage, the rollout is automatically rolled back to blue within seconds. This pattern, combined with feature flags for backwards-incompatible changes, makes most deploys zero-downtime."
+    },
+    {
+      "doc_id": "doc-observability",
+      "topic": "observability",
+      "text": "The service emits the three pillars of observability: structured logs through Loguru with request-scoped correlation IDs, RED metrics (rate, errors, duration) via Prometheus, and distributed traces via OpenTelemetry exported to a vendor-neutral collector. SLO dashboards track p50, p95 and p99 latency alongside error-budget burn rates, and alerts fire on multi-window multi-burn-rate detectors rather than instantaneous thresholds to reduce pager noise. Trace sampling is head-based at one percent with tail-based amplification for error and high-latency spans."
+    },
+    {
+      "doc_id": "doc-database-sharding",
+      "topic": "database sharding",
+      "text": "The primary datastore is horizontally sharded by tenant identifier using a consistent-hash ring, which keeps hot tenants from saturating a single shard. Each shard runs in primary-replica replication with synchronous replication to one in-zone replica and asynchronous replication to a cross-region follower. Read traffic is routed to replicas via a read-only connection string, while writes always go to the primary. The sharding layer exposes a virtual-shard abstraction so that rebalancing can move ownership between physical hosts without changing application code."
+    },
+    {
+      "doc_id": "doc-cdn-edge",
+      "topic": "cdn",
+      "text": "Static assets and many idempotent API responses are served from a content delivery network with points of presence in every major region. Edge cache rules include a short stale-while-revalidate window so that even when origin is briefly unavailable, end users continue to see fresh-enough content. Personalised responses use edge-side cache keys based on tenant and locale rather than user identifier, maximising hit rate without leaking data. The CDN also offloads the bulk of read traffic from origin, cutting bandwidth costs by an order of magnitude."
+    },
+    {
+      "doc_id": "doc-rate-limiting",
+      "topic": "rate limiting",
+      "text": "Public APIs are protected by a token-bucket rate limiter applied at the edge per API key and per IP. Burst capacity is sized to handle legitimate spiky workloads, while the steady-state refill rate enforces fair usage across tenants. Rate-limit decisions are recorded as structured events for later quota analytics, and 429 responses include a Retry-After header derived from the bucket state. Internal traffic is exempt by signed service-to-service tokens, and abusive sources can be tarpitted at the L4 firewall once a sustained-violation threshold is crossed."
+    }
+  ]
+}

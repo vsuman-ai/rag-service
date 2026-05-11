@@ -1,0 +1,36 @@
+{
+  "description": "Benchmark queries used to compare Strategy A (raw vector search) vs Strategy B (AI-enhanced retrieval with query expansion). Each query lists the doc_id(s) that should appear in the top-k as 'relevant_doc_ids', enabling precision/recall/MRR computation. The first 3 queries are the assessment-required 'complex' queries; the remaining queries broaden coverage.",
+  "top_k": 3,
+  "queries": [
+    {
+      "query": "How does the system handle peak load?",
+      "relevant_doc_ids": ["doc-autoscaling", "doc-load-balancing", "doc-rate-limiting"],
+      "notes": "Conversational phrasing; corpus uses 'autoscaling', 'horizontal scaling', 'load balancer'. Query expansion should help here."
+    },
+    {
+      "query": "What stops one slow dependency from breaking everything?",
+      "relevant_doc_ids": ["doc-circuit-breaker"],
+      "notes": "Indirect phrasing of 'circuit breaker / bulkhead' concept."
+    },
+    {
+      "query": "How do we deploy a new version without downtime?",
+      "relevant_doc_ids": ["doc-blue-green"],
+      "notes": "User speaks in plain English; corpus uses 'blue-green', 'progressive traffic shifting'."
+    },
+    {
+      "query": "How do we speed up frequent reads of the same data?",
+      "relevant_doc_ids": ["doc-caching", "doc-cdn-edge"],
+      "notes": "Tests vocabulary gap: 'speed up' -> 'cache', 'CDN'."
+    },
+    {
+      "query": "What if a user sends way too many requests?",
+      "relevant_doc_ids": ["doc-rate-limiting"],
+      "notes": "Tests synonym expansion: 'too many requests' -> 'rate limit', 'throttle'."
+    },
+    {
+      "query": "How do we know when something is broken in production?",
+      "relevant_doc_ids": ["doc-observability"],
+      "notes": "Tests synonym expansion: 'know when broken' -> 'metrics', 'tracing', 'monitor'."
+    }
+  ]
+}
