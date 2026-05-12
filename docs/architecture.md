@@ -37,12 +37,8 @@ the codebase top-down.
        (all-MiniLM-L6-v2)         OR real Gemini 1.5 Flash        (PersistentClient)
 ```
 
-`*` Matching Engine adapter is the migration target — see §4.
-
-The split between `app/` (HTTP/DTO/DI wiring) and `lib/` (framework-agnostic
-embedding / vector-store / LLM primitives) is borrowed from
-`bigdata/onticai/semantic_search` and `bigdata/onticai/embedding/lib`.
-
+The split between `app/` (HTTP/DTO/DI wiring) and `core/` (framework-agnostic
+embedding / vector-store / LLM primitives).
 ---
 
 ## 2. Strategy A vs Strategy B — what they actually do
@@ -164,9 +160,7 @@ ChromaDB wins because:
 
 Pinecone is disqualified by the "local" constraint. FAISS would have been a
 fine second choice but loses ground on persistence and metadata. Qdrant is
-what the [bigdata reference project](../../../code/bigdata/onticai/semantic_search)
-uses, but it's a server-first DB and overkill for a 10-paragraph
-assessment.
+what we uses, but it's a server-first DB and overkill for a 10-paragraph.
 
 The `VectorStore` ABC means swapping any of these in later is a single
 provider change in the DI container.
