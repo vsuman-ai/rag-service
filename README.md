@@ -9,10 +9,6 @@ retrieval strategies:
 - **Strategy B — AI-Enhanced Retrieval**: send the query through a (mocked)
   Vertex AI Gemini model to rewrite/expand it with domain-specific vocabulary,
   then embed and search.
-
-#The full assessment brief lives at
-#[ docs/GenAI_RAG_VectorSearch_Assessment.pdf`](docs/GenAI_RAG_VectorSearch_Assessment.pdf).
-
 ---
 
 ## TL;DR — run the benchmark in one command
